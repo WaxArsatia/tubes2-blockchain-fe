@@ -31,12 +31,11 @@ function stringifyArg(value: unknown): string {
 }
 
 function parseStatus(value: unknown): string {
-  if (typeof value !== "bigint") {
-    return stringifyArg(value)
+  if (typeof value === "bigint" || typeof value === "number") {
+    return getRoundStatusLabel(Number(value) as RoundStatus)
   }
 
-  const numericStatus = Number(value) as RoundStatus
-  return getRoundStatusLabel(numericStatus)
+  return stringifyArg(value)
 }
 
 export function decodeContractError(error: unknown): string {

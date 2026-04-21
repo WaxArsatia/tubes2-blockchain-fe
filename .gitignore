@@ -23,5 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Local environment files
+.env
+.env.*
+!.env.example
+
 .github/prompts
 .serena
+.env

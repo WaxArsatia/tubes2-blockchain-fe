@@ -750,7 +750,7 @@ export function App() {
                         Total Pool:{" "}
                         {formatGameTokenAmount(inspectedRound.totalPool)} GAME
                       </div>
-                      {inspectedBet ? (
+                      {inspectedBet?.placed ? (
                         <>
                           <Separator className="my-2" />
                           <div>

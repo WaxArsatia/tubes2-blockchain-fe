@@ -37,6 +37,7 @@ export function useRoundHistory() {
   const [cursorBlock, setCursorBlock] = useState<bigint | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [hasLoadError, setHasLoadError] = useState(false)
 
   const loadMore = useCallback(async () => {
     if (!publicClient || isLoading || !hasMore) {
@@ -134,6 +135,7 @@ export function useRoundHistory() {
       }
     } catch {
       toast.error("Failed to load round history from events.")
+      setHasLoadError(true)
     } finally {
       setIsLoading(false)
     }
@@ -143,10 +145,11 @@ export function useRoundHistory() {
     setItems([])
     setCursorBlock(null)
     setHasMore(true)
+    setHasLoadError(false)
   }, [])
 
   useEffect(() => {
-    if (items.length === 0 && hasMore && !isLoading) {
+    if (items.length === 0 && hasMore && !isLoading && !hasLoadError) {
       const timer = window.setTimeout(() => {
         void loadMore()
       }, 0)
@@ -157,7 +160,7 @@ export function useRoundHistory() {
     }
 
     return undefined
-  }, [hasMore, isLoading, items.length, loadMore])
+  }, [hasLoadError, hasMore, isLoading, items.length, loadMore])
 
   const itemCountLabel = useMemo(() => {
     if (items.length === 0) {
