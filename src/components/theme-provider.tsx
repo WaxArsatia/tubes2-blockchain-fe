@@ -9,6 +9,7 @@ type ThemeProviderProps = {
   defaultTheme?: Theme
   storageKey?: string
   disableTransitionOnChange?: boolean
+  forcedTheme?: ResolvedTheme
 }
 
 type ThemeProviderState = {
@@ -82,9 +83,14 @@ export function ThemeProvider({
   defaultTheme = "system",
   storageKey = "theme",
   disableTransitionOnChange = true,
+  forcedTheme,
   ...props
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(() => {
+    if (forcedTheme) {
+      return forcedTheme
+    }
+
     const storedTheme = localStorage.getItem(storageKey)
     if (isTheme(storedTheme)) {
       return storedTheme
@@ -95,10 +101,14 @@ export function ThemeProvider({
 
   const setTheme = React.useCallback(
     (nextTheme: Theme) => {
+      if (forcedTheme) {
+        return
+      }
+
       localStorage.setItem(storageKey, nextTheme)
       setThemeState(nextTheme)
     },
-    [storageKey]
+    [forcedTheme, storageKey]
   )
 
   const applyTheme = React.useCallback(
@@ -121,6 +131,11 @@ export function ThemeProvider({
   )
 
   React.useEffect(() => {
+    if (forcedTheme) {
+      applyTheme(forcedTheme)
+      return undefined
+    }
+
     applyTheme(theme)
 
     if (theme !== "system") {
@@ -137,9 +152,13 @@ export function ThemeProvider({
     return () => {
       mediaQuery.removeEventListener("change", handleChange)
     }
-  }, [theme, applyTheme])
+  }, [forcedTheme, theme, applyTheme])
 
   React.useEffect(() => {
+    if (forcedTheme) {
+      return undefined
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.repeat) {
         return
@@ -177,9 +196,13 @@ export function ThemeProvider({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [storageKey])
+  }, [forcedTheme, storageKey])
 
   React.useEffect(() => {
+    if (forcedTheme) {
+      return undefined
+    }
+
     const handleStorageChange = (event: StorageEvent) => {
       if (event.storageArea !== localStorage) {
         return
@@ -202,7 +225,7 @@ export function ThemeProvider({
     return () => {
       window.removeEventListener("storage", handleStorageChange)
     }
-  }, [defaultTheme, storageKey])
+  }, [defaultTheme, forcedTheme, storageKey])
 
   const value = React.useMemo(
     () => ({
