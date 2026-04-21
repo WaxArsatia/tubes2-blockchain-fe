@@ -53,11 +53,17 @@ export function useRoleAccess() {
     }
   }, [roleChecksQuery.data])
 
+  const hasResolvedRoleChecks = Boolean(roleChecksQuery.data)
+
   return {
     ...access,
     isConnected: Boolean(address),
     roleWarning:
-      address && !access.isAdmin && !access.isOperator && !access.isTreasurer
+      address &&
+      hasResolvedRoleChecks &&
+      !access.isAdmin &&
+      !access.isOperator &&
+      !access.isTreasurer
         ? "Connected wallet has no privileged role. Panels remain read-only."
         : null,
   }
