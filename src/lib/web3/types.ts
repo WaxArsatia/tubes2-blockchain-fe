@@ -103,6 +103,13 @@ export function getRoundStatusLabel(status: RoundStatus): string {
   }
 }
 
-export function getSideLabel(side: RoundSide): "SIDE_A" | "SIDE_B" {
-  return side === RoundSide.SIDE_A ? "SIDE_A" : "SIDE_B"
+export function getSideLabel(side: RoundSide): string {
+  switch (side) {
+    case RoundSide.SIDE_A:
+      return "SIDE_A"
+    case RoundSide.SIDE_B:
+      return "SIDE_B"
+    default:
+      return "Unknown"
+  }
 }
