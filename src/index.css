@@ -140,7 +140,8 @@
     min-height: 100%;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    `@apply` bg-background text-foreground antialiased;
+
     background-image:
       radial-gradient(
         circle at 12% 18%,
