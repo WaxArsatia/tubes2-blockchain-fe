@@ -103,7 +103,9 @@ export function useBettingReads() {
         Boolean(item)
       )
       .map((item) => mapRoundView(item))
-      .sort((left, right) => Number(right.id - left.id))
+      .sort((left, right) =>
+        left.id === right.id ? 0 : left.id < right.id ? 1 : -1
+      )
   }, [roundViewsQuery.data])
 
   const playerBetsByRound = useMemo(() => {
@@ -117,7 +119,7 @@ export function useBettingReads() {
       const resolved = unwrapReadResult(item)
       const roundId = roundIds[index]
 
-      if (!resolved || !roundId) {
+      if (!resolved || roundId === undefined) {
         return
       }
 
