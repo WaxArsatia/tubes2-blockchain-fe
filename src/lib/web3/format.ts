@@ -7,16 +7,15 @@ export function formatGameTokenAmount(
   amount: bigint,
   fractionDigits = 2
 ): string {
-  const normalized = Number(formatUnits(amount, TOKEN_DECIMALS))
+  const normalized = formatUnits(amount, TOKEN_DECIMALS)
+  const [whole, fraction = ""] = normalized.split(".")
+  const maxFractionDigits = Math.max(0, Math.trunc(fractionDigits))
+  const visibleFraction = fraction
+    .slice(0, maxFractionDigits)
+    .replace(/0+$/, "")
+  const groupedWhole = BigInt(whole).toLocaleString("en-US")
 
-  if (!Number.isFinite(normalized)) {
-    return "0"
-  }
-
-  return normalized.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: fractionDigits,
-  })
+  return visibleFraction ? `${groupedWhole}.${visibleFraction}` : groupedWhole
 }
 
 export function formatTimestamp(timestamp: bigint): string {
