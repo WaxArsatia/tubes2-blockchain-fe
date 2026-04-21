@@ -6,7 +6,6 @@ import { usePublicClient } from "wagmi"
 
 import {
   BLOCKCHAIN_GAME_CONTRACT_ADDRESS,
-  HISTORY_BLOCK_WINDOW,
   HISTORY_RETENTION,
   SEPOLIA_EXPLORER_BASE_URL,
 } from "@/lib/web3/constants"
@@ -34,7 +33,6 @@ export function useRoundHistory() {
   const publicClient = usePublicClient()
 
   const [items, setItems] = useState<RoundHistoryItem[]>([])
-  const [cursorBlock, setCursorBlock] = useState<bigint | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [hasLoadError, setHasLoadError] = useState(false)
@@ -47,9 +45,8 @@ export function useRoundHistory() {
     setIsLoading(true)
 
     try {
-      const latest = cursorBlock ?? (await publicClient.getBlockNumber())
-      const fromBlock =
-        latest > HISTORY_BLOCK_WINDOW ? latest - HISTORY_BLOCK_WINDOW : 0n
+      const fromBlock = await publicClient.getBlockNumber()
+      const latest = await publicClient.getBlockNumber()
 
       const [settledLogs, canceledLogs] = await Promise.all([
         publicClient.getLogs({
@@ -127,23 +124,17 @@ export function useRoundHistory() {
         return sortHistory([...dedupe.values()]).slice(0, HISTORY_RETENTION)
       })
 
-      if (fromBlock === 0n) {
-        setHasMore(false)
-        setCursorBlock(null)
-      } else {
-        setCursorBlock(fromBlock - 1n)
-      }
+      setHasMore(false)
     } catch {
       toast.error("Failed to load round history from events.")
       setHasLoadError(true)
     } finally {
       setIsLoading(false)
     }
-  }, [cursorBlock, hasMore, isLoading, publicClient])
+  }, [hasMore, isLoading, publicClient])
 
   const refresh = useCallback(() => {
     setItems([])
-    setCursorBlock(null)
     setHasMore(true)
     setHasLoadError(false)
   }, [])
